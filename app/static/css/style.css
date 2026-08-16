@@ -1,0 +1,44 @@
+/* Custom styles for RajBlog */
+
+body {
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Navbar brand styling */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+/* Flash message spacing */
+.alert {
+    margin-bottom: 0.5rem;
+}
+
+/* Post excerpt styling */
+.post-excerpt {
+    color: #6c757d;
+}
+
+/* Card hover effect for post listings */
+.card:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Error page styling */
+.display-1 {
+    font-size: 6rem;
+    font-weight: 300;
+}
