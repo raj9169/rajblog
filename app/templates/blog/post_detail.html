@@ -3,67 +3,54 @@
 {% block title %}{{ post.title }} - RajBlog{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <!-- Post Content -->
-        <article class="mb-5">
-            <h1 class="mb-3">{{ post.title }}</h1>
-            <p class="text-muted">
-                By <strong>{{ post.author.username }}</strong> on {{ post.created_at.strftime('%B %d, %Y') }}
-            </p>
+<div class="post-single">
+    <div class="post-header">
+        <h1>{{ post.title }}</h1>
+        <div class="post-meta-bar">
+            <span>By <strong>{{ post.author.username }}</strong></span>
+            <span>&middot;</span>
+            <span>{{ post.created_at.strftime('%B %d, %Y') }}</span>
             {% if current_user.is_authenticated and current_user.id == post.author_id %}
-            <div class="mb-3">
-                <a href="{{ url_for('blog.edit_post', slug=post.slug) }}" class="btn btn-outline-secondary btn-sm">Edit Post</a>
-            </div>
+            <span>&middot;</span>
+            <a href="{{ url_for('blog.edit_post', slug=post.slug) }}" class="read-more" style="font-size: 0.85rem;">Edit</a>
             {% endif %}
-            <hr>
-            <div class="post-content">
-                {{ post.content }}
-            </div>
-        </article>
+        </div>
+    </div>
 
-        <!-- Comments Section -->
-        <section>
-            <h2 class="mb-4">Comments ({{ comments|length }})</h2>
+    <div class="post-content">
+        {{ post.content }}
+    </div>
 
-            {% for comment in comments %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <p class="card-text">{{ comment.content }}</p>
-                    <p class="text-muted small mb-0">
-                        <strong>{{ comment.author.username }}</strong> &middot; {{ comment.created_at.strftime('%B %d, %Y at %H:%M') }}
-                    </p>
-                </div>
-            </div>
-            {% else %}
-            <p class="text-muted">No comments yet. Be the first to comment!</p>
-            {% endfor %}
+    <!-- Comments -->
+    <div class="comments-section">
+        <h2>Comments ({{ comments|length }})</h2>
 
-            <!-- Comment Form -->
-            {% if current_user.is_authenticated %}
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h5 class="card-title">Leave a Comment</h5>
-                    <form method="POST" action="{{ url_for('blog.add_comment', slug=post.slug) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <div class="mb-3">
-                            <label for="content" class="form-label">Comment</label>
-                            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Post Comment</button>
-                    </form>
-                </div>
+        {% for comment in comments %}
+        <div class="comment-card">
+            <div class="comment-author">
+                {{ comment.author.username }}
+                <span class="comment-date">&middot; {{ comment.created_at.strftime('%B %d, %Y') }}</span>
             </div>
-            {% else %}
-            <div class="card mt-4">
-                <div class="card-body text-center">
-                    <p class="mb-2">You must be logged in to leave a comment.</p>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary">Register</a>
-                </div>
+            <div class="comment-body">{{ comment.content }}</div>
+        </div>
+        {% else %}
+        <p style="color: var(--color-text-secondary); margin: 1rem 0;">No comments yet. Be the first to comment!</p>
+        {% endfor %}
+
+        {% if current_user.is_authenticated %}
+        <form method="POST" action="{{ url_for('blog.add_comment', slug=post.slug) }}" style="margin-top: 1.5rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="content">Leave a comment</label>
+                <textarea name="content" id="content" rows="3" required></textarea>
             </div>
-            {% endif %}
-        </section>
+            <button type="submit" class="btn-primary">Post Comment</button>
+        </form>
+        {% else %}
+        <p style="margin-top: 1.5rem; color: var(--color-text-secondary);">
+            <a href="{{ url_for('auth.login') }}" style="color: var(--color-primary);">Login</a> to leave a comment.
+        </p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

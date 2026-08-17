@@ -3,57 +3,78 @@
 {% block title %}RajBlog{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <h1 class="mb-4">Latest Posts</h1>
+<div class="blog-header">
+    <h1>Blog</h1>
+</div>
 
-        {% for post in posts %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title h4">
-                    <a href="{{ url_for('blog.post_detail', slug=post.slug) }}" class="text-decoration-none">{{ post.title }}</a>
-                </h2>
-                <p class="text-muted small mb-2">
-                    By <strong>{{ post.author.username }}</strong> on {{ post.created_at.strftime('%B %d, %Y') }}
-                </p>
-                <p class="card-text">{{ post.excerpt }}{% if post.content|length > 200 %}...{% endif %}</p>
-                <a href="{{ url_for('blog.post_detail', slug=post.slug) }}" class="btn btn-outline-primary btn-sm">Read More</a>
+<!-- Featured Post (first post) -->
+{% if posts %}
+{% set featured = posts[0] %}
+<div class="featured-post">
+    <div class="featured-content">
+        <div class="featured-category">Blog</div>
+        <h2 class="featured-title">{{ featured.title }}</h2>
+        <div class="featured-author">
+            <div class="author-avatar">{{ featured.author.username[0]|upper }}</div>
+            <div class="author-info">
+                <div class="name">{{ featured.author.username }}</div>
+                <div class="role">Author</div>
             </div>
         </div>
-        {% else %}
-        <div class="text-center py-5">
-            <p class="text-muted fs-5">No posts yet.</p>
-        </div>
-        {% endfor %}
-
-        <!-- Pagination Controls -->
-        {% if pagination.pages > 1 %}
-        <nav aria-label="Post pagination">
-            <ul class="pagination justify-content-center">
-                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('blog.index', page=pagination.prev_num) if pagination.has_prev else '#' }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                    {% if page_num %}
-                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('blog.index', page=page_num) }}">{{ page_num }}</a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&hellip;</span>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('blog.index', page=pagination.next_num) if pagination.has_next else '#' }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        {% endif %}
+        <p class="featured-excerpt">{{ featured.excerpt }}{% if featured.content|length > 200 %}...{% endif %}</p>
+        <a href="{{ url_for('blog.post_detail', slug=featured.slug) }}" class="read-more">Read more</a>
+    </div>
+    <div class="featured-image">
+        {{ featured.title[:10]|upper }}
     </div>
 </div>
+
+<!-- Post listing -->
+<ul class="post-list">
+    {% for post in posts[1:] %}
+    <li class="post-item">
+        <div>
+            <div class="post-category">Blog</div>
+            <h3 class="post-title">
+                <a href="{{ url_for('blog.post_detail', slug=post.slug) }}">{{ post.title }}</a>
+            </h3>
+            <p class="post-excerpt">{{ post.excerpt }}{% if post.content|length > 200 %}...{% endif %}</p>
+            <a href="{{ url_for('blog.post_detail', slug=post.slug) }}" class="read-more">Read more</a>
+        </div>
+        <div class="post-meta">
+            <div class="post-date">{{ post.created_at.strftime('%B %d, %Y') }}</div>
+            <div class="post-author-info">
+                <div class="avatar-small">{{ post.author.username[0]|upper }}</div>
+                <span>{{ post.author.username }}</span>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+<ul class="pagination">
+    {% if pagination.has_prev %}
+    <li><a href="{{ url_for('blog.index', page=pagination.prev_num) }}">&laquo;</a></li>
+    {% endif %}
+    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+        <li><a href="{{ url_for('blog.index', page=page_num) }}" class="{{ 'active' if page_num == pagination.page }}">{{ page_num }}</a></li>
+        {% else %}
+        <li><span>&hellip;</span></li>
+        {% endif %}
+    {% endfor %}
+    {% if pagination.has_next %}
+    <li><a href="{{ url_for('blog.index', page=pagination.next_num) }}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <h3>No posts yet</h3>
+    <p>Check back soon for new content.</p>
+</div>
+{% endif %}
 {% endblock %}

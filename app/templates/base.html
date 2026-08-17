@@ -4,80 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}RajBlog{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-          crossorigin="anonymous">
-    <!-- Custom styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="site-nav">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('blog.index') }}">RajBlog</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('blog.index') }}">Home</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('blog.dashboard') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('blog.create_post') }}">New Post</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
+            <a href="{{ url_for('blog.index') }}" class="logo">rajblog</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('blog.index') }}">Home</a></li>
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('blog.dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('blog.create_post') }}">New Post</a></li>
+                <li><a href="{{ url_for('auth.logout') }}" class="btn-nav">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}" class="btn-nav">Register</a></li>
+                {% endif %}
+            </ul>
         </div>
     </nav>
 
     <!-- Flash Messages -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' or category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash-msg {{ category }}">
+                <span>{{ message }}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
 
     <!-- Main Content -->
-    <main class="container mt-4">
+    <main>
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light text-center py-3 mt-5">
-        <div class="container">
-            <p class="mb-0">&copy; 2024 RajBlog. Built with Flask &amp; Bootstrap.</p>
-        </div>
+    <footer class="site-footer">
+        &copy; 2024 RajBlog. Built with Flask.
     </footer>
-
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"></script>
 </body>
 </html>
