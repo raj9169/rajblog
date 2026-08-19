@@ -3,7 +3,6 @@
 import json
 import os
 import re
-import urllib.parse
 
 import requests
 
@@ -12,19 +11,15 @@ MODEL = "openai/gpt-4o-mini"
 
 
 def get_unsplash_image(query: str, width: int = 800, height: int = 450) -> str:
-    """Get a free image URL from Unsplash Source (no API key needed).
+    """Get a free image URL from Picsum (always works, no API key needed).
     
-    Returns a small, optimized image URL (~30-50KB at 800x450).
+    Returns a random image (~30-50KB at 800x450).
+    Uses a seed based on the query so same topic gets same image.
     """
-    # Clean query for URL
-    clean_query = re.sub(r'[^a-zA-Z0-9 ]', '', query).strip()
-    if not clean_query:
-        clean_query = "blog"
-    # Use first 2-3 words for better image relevance
-    words = clean_query.split()[:3]
-    query_str = ",".join(words)
-    
-    return f"https://source.unsplash.com/{width}x{height}/?{urllib.parse.quote(query_str)}"
+    import hashlib
+    # Create a numeric seed from the query for consistent images per topic
+    seed = int(hashlib.md5(query.encode()).hexdigest()[:8], 16) % 1000
+    return f"https://picsum.photos/seed/{seed}/{width}/{height}"
 
 
 SYSTEM_PROMPT = """You are an expert blog writer for stayhealthylife.in — a multi-topic blog covering health, technology, sports, lifestyle, finance, science, entertainment, and education.
