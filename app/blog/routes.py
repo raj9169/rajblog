@@ -170,3 +170,58 @@ def dashboard():
 def profile():
     """Display user profile."""
     return render_template('blog/profile.html', user=current_user)
+
+
+@blog_bp.route('/sitemap.xml')
+def sitemap():
+    """Generate XML sitemap for SEO."""
+    from flask import make_response
+
+    posts = Post.query.filter_by(status='published').order_by(
+        Post.updated_at.desc()
+    ).all()
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    # Home page
+    xml += '  <url>\n'
+    xml += f'    <loc>https://stayhealthylife.in/</loc>\n'
+    xml += '    <changefreq>daily</changefreq>\n'
+    xml += '    <priority>1.0</priority>\n'
+    xml += '  </url>\n'
+
+    # All published posts
+    for post in posts:
+        xml += '  <url>\n'
+        xml += f'    <loc>https://stayhealthylife.in/post/{post.slug}</loc>\n'
+        xml += f'    <lastmod>{post.updated_at.strftime("%Y-%m-%d")}</lastmod>\n'
+        xml += '    <changefreq>weekly</changefreq>\n'
+        xml += '    <priority>0.8</priority>\n'
+        xml += '  </url>\n'
+
+    xml += '</urlset>'
+
+    response = make_response(xml)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
+
+
+@blog_bp.route('/robots.txt')
+def robots():
+    """Serve robots.txt for search engines."""
+    from flask import make_response
+
+    content = """User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /post/new
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://stayhealthylife.in/sitemap.xml
+"""
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/plain'
+    return response

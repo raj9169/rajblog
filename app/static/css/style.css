@@ -190,15 +190,12 @@ main {
 }
 
 .featured-post .featured-image {
-    background: var(--color-accent-gradient);
+    background: var(--color-bg-light);
     min-height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: 8px;
+    overflow: hidden;
 }
 
 /* Read more link */

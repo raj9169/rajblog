@@ -3,7 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}RajBlog{% endblock %}</title>
+    <title>{% block title %}RajBlog - Stay Healthy Life{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Stay Healthy Life - Your daily source for health, tech, sports, lifestyle, and trending topics.{% endblock %}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{% block canonical %}https://stayhealthylife.in{{ request.path }}{% endblock %}">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}RajBlog{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Stay Healthy Life - Your daily source for trending topics.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://picsum.photos/seed/rajblog/1200/630{% endblock %}">
+    <meta property="og:url" content="https://stayhealthylife.in{{ request.path }}">
+    <meta property="og:site_name" content="StayHealthyLife">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -46,7 +61,7 @@
 
     <!-- Footer -->
     <footer class="site-footer">
-        &copy; 2024 RajBlog. Built with Flask.
+        &copy; 2024 StayHealthyLife.in — Built by Rajkushwaha
     </footer>
 </body>
 </html>

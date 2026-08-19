@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{{ post.title }} - RajBlog{% endblock %}
+{% block title %}{{ post.title }} - StayHealthyLife{% endblock %}
+{% block meta_description %}{{ post.content|striptags|truncate(155) }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.content|striptags|truncate(155) }}{% endblock %}
+{% block og_image %}https://picsum.photos/seed/{{ post.slug|truncate(20, True, '') }}/1200/630{% endblock %}
 
 {% block content %}
-<div class="post-single">
+<article class="post-single">
     <div class="post-header">
         <h1>{{ post.title }}</h1>
         <div class="post-meta-bar">
@@ -52,5 +57,5 @@
         </p>
         {% endif %}
     </div>
-</div>
+</article>
 {% endblock %}

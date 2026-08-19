@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RajBlog{% endblock %}
+{% block title %}StayHealthyLife - Trending Blog{% endblock %}
 
 {% block content %}
 <div class="blog-header">
@@ -10,35 +10,37 @@
 <!-- Featured Post (first post) -->
 {% if posts %}
 {% set featured = posts[0] %}
+<a href="{{ url_for('blog.post_detail', slug=featured.slug) }}" style="text-decoration: none; color: inherit;">
 <div class="featured-post">
     <div class="featured-content">
-        <div class="featured-category">Blog</div>
+        <div class="featured-category">Trending</div>
         <h2 class="featured-title">{{ featured.title }}</h2>
         <div class="featured-author">
             <div class="author-avatar">{{ featured.author.username[0]|upper }}</div>
             <div class="author-info">
                 <div class="name">{{ featured.author.username }}</div>
-                <div class="role">Author</div>
+                <div class="role">{{ featured.created_at.strftime('%b %d, %Y') }}</div>
             </div>
         </div>
-        <p class="featured-excerpt">{{ featured.excerpt }}{% if featured.content|length > 200 %}...{% endif %}</p>
-        <a href="{{ url_for('blog.post_detail', slug=featured.slug) }}" class="read-more">Read more</a>
+        <p class="featured-excerpt">{{ featured.content|striptags|truncate(180) }}</p>
+        <span class="read-more">Read more</span>
     </div>
     <div class="featured-image">
-        {{ featured.title[:10]|upper }}
+        <img src="https://picsum.photos/seed/{{ featured.slug|truncate(15, True, '') }}/600/400" alt="{{ featured.title }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
     </div>
 </div>
+</a>
 
 <!-- Post listing -->
 <ul class="post-list">
     {% for post in posts[1:] %}
     <li class="post-item">
         <div>
-            <div class="post-category">Blog</div>
+            <div class="post-category">Trending</div>
             <h3 class="post-title">
                 <a href="{{ url_for('blog.post_detail', slug=post.slug) }}">{{ post.title }}</a>
             </h3>
-            <p class="post-excerpt">{{ post.excerpt }}{% if post.content|length > 200 %}...{% endif %}</p>
+            <p class="post-excerpt">{{ post.content|striptags|truncate(160) }}</p>
             <a href="{{ url_for('blog.post_detail', slug=post.slug) }}" class="read-more">Read more</a>
         </div>
         <div class="post-meta">
