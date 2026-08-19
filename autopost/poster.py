@@ -13,22 +13,6 @@ from app.models.user import User
 from app.utils import generate_slug
 
 
-def get_or_create_bot_user(app):
-    """Get or create the bot user for auto-posting."""
-    with app.app_context():
-        bot = User.query.filter_by(username="rajblog-bot").first()
-        if not bot:
-            bot = User(
-                username="rajblog-bot",
-                email="bot@stayhealthylife.in",
-            )
-            bot.set_password(os.environ.get("BOT_PASSWORD", "auto-post-secure-2024!"))
-            db.session.add(bot)
-            db.session.commit()
-            print("Created bot user: rajblog-bot")
-        return bot
-
-
 def is_duplicate(title: str, slug: str) -> bool:
     """Check if a post with similar title or slug already exists."""
     # Check exact slug match
@@ -50,19 +34,22 @@ def publish_post(post_data: dict) -> bool:
     app = create_app()
 
     with app.app_context():
-        # Get or create bot user
-        bot = User.query.filter_by(username="rajblog-bot").first()
-        if not bot:
-            bot = User(
-                username="rajblog-bot",
-                email="bot@stayhealthylife.in",
-            )
-            bot.set_password(os.environ.get("BOT_PASSWORD", "auto-post-secure-2024!"))
-            db.session.add(bot)
-            db.session.commit()
-            print("Created bot user: rajblog-bot")
+        # Find the author by email from env config
+        author_email = os.environ.get("AUTOPOST_AUTHOR_EMAIL", "")
+        
+        if author_email:
+            author = User.query.filter_by(email=author_email).first()
+            if not author:
+                print(f"ERROR: No user found with email '{author_email}'. Register first.")
+                return False
+        else:
+            # Fallback: use first user in database
+            author = User.query.first()
+            if not author:
+                print("ERROR: No users in database. Register an account first.")
+                return False
 
-        bot_id = bot.id
+        author_id = author.id
         title = post_data["title"]
         slug = post_data["slug"]
 
@@ -81,11 +68,11 @@ def publish_post(post_data: dict) -> bool:
             title=title,
             slug=slug,
             content=post_data["content"],
-            author_id=bot_id,
+            author_id=author_id,
             status="published",
         )
         db.session.add(post)
         db.session.commit()
 
-        print(f"PUBLISHED: {title} (/{slug})")
+        print(f"PUBLISHED: {title} (/{slug}) — by {author.username}")
         return True
