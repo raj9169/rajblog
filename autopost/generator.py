@@ -22,6 +22,48 @@ def get_unsplash_image(query: str, width: int = 800, height: int = 450) -> str:
     return f"https://picsum.photos/seed/{seed}/{width}/{height}"
 
 
+def get_brand_logo(brand_name: str) -> str | None:
+    """Try to get a brand/company logo using Clearbit Logo API (free).
+    
+    Returns logo URL or None if not found.
+    """
+    # Common brand domain mappings
+    domain_hints = {
+        "air india": "airindia.com",
+        "google": "google.com",
+        "apple": "apple.com",
+        "microsoft": "microsoft.com",
+        "amazon": "amazon.com",
+        "netflix": "netflix.com",
+        "samsung": "samsung.com",
+        "tesla": "tesla.com",
+        "meta": "meta.com",
+        "facebook": "facebook.com",
+        "twitter": "twitter.com",
+        "instagram": "instagram.com",
+        "whatsapp": "whatsapp.com",
+        "youtube": "youtube.com",
+        "spotify": "spotify.com",
+        "uber": "uber.com",
+        "zomato": "zomato.com",
+        "swiggy": "swiggy.com",
+        "paytm": "paytm.com",
+        "flipkart": "flipkart.com",
+        "myntra": "myntra.com",
+        "reliance": "relianceindustries.com",
+        "tata": "tata.com",
+        "infosys": "infosys.com",
+        "wipro": "wipro.com",
+    }
+    
+    brand_lower = brand_name.lower().strip()
+    for key, domain in domain_hints.items():
+        if key in brand_lower:
+            return f"https://logo.clearbit.com/{domain}"
+    
+    return None
+
+
 SYSTEM_PROMPT = """You are an expert blog writer for stayhealthylife.in — a multi-topic blog covering health, technology, sports, lifestyle, finance, science, entertainment, and education.
 
 You write SEO-optimized, engaging, factual articles that are:
@@ -75,6 +117,14 @@ Requirements:
 <h2>What This Means for You</h2>
 <p>Practical takeaways — what should the reader do with this information? 3-5 actionable points.</p>
 
+<h2>Official Links & References</h2>
+<ul>
+<li><a href="[REAL official website URL]" target="_blank" rel="noopener">[Source Name]</a> — brief description of what this link provides</li>
+<li><a href="[REAL official URL]" target="_blank" rel="noopener">[Source Name]</a> — brief description</li>
+<li><a href="[REAL official URL]" target="_blank" rel="noopener">[Source Name]</a> — brief description</li>
+</ul>
+<p><em>Note: Always verify information from official sources before taking action.</em></p>
+
 <h2>Frequently Asked Questions</h2>
 <p><strong>Q: [Relevant Question 1]?</strong></p>
 <p>Answer in 2-3 sentences.</p>
@@ -84,6 +134,15 @@ Requirements:
 <p>Answer in 2-3 sentences.</p>
 
 <p class="conclusion"><strong>Final Thoughts:</strong> Wrap up with 2-3 engaging sentences. Invite readers to share their thoughts in the comments or share this article with someone who'd find it useful.</p>
+
+CRITICAL RULES FOR LINKS & REFERENCES:
+- ALWAYS include real, working URLs to official sources (government sites, company websites, official apps, news outlets)
+- If talking about a company (e.g. Air India), link to their official website (airindia.com)
+- If talking about a job/form, link to the official application page
+- If talking about an app, link to the official app store page or website
+- If talking about a government scheme, link to the official .gov.in page
+- Use ONLY real, existing URLs — do NOT make up fake URLs
+- Include 2-4 reference links per post
 
 SEO Rules:
 - Write entirely in English (even if topic is in another language)
@@ -149,12 +208,18 @@ def generate_post(topic: str, category: str = "General") -> dict | None:
         post_data["slug"] = re.sub(r"[^a-z0-9-]", "", post_data["slug"].lower())
         post_data["slug"] = re.sub(r"-+", "-", post_data["slug"]).strip("-")
 
-        # Add featured image using Unsplash
+        # Add featured image using Picsum
         image_keywords = post_data.get("image_keywords", topic)
         image_url = get_unsplash_image(image_keywords)
         
-        # Insert image at the top of content (after the hook paragraph)
+        # Check if there's a brand logo to include
+        brand_logo = get_brand_logo(topic)
+        
+        # Build image HTML
         image_html = f'<img src="{image_url}" alt="{post_data["title"]}" style="width:100%;border-radius:8px;margin:1.5rem 0;" loading="lazy">'
+        
+        if brand_logo:
+            image_html += f'\n<p style="text-align:center;margin:1rem 0;"><img src="{brand_logo}" alt="{topic}" style="height:40px;margin:0 auto;" loading="lazy"></p>'
         
         # Insert after first </p>
         first_p_end = post_data["content"].find("</p>")
